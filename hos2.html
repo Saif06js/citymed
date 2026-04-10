@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CityMed — Unified Healthcare Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230a4d68'/><path d='M10 16h12M16 10v12' stroke='white' stroke-width='3' stroke-linecap='round'/></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="hos2.css"/>
+</head>
+<body>
+
+<!-- ═══════════ MODALS BACKDROP ═══════════ -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════ LOGIN MODAL ═══════════ -->
+<div class="modal" id="loginModal">
+  <button class="modal-close" id="closeLogin" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="modal-brand">
+    <div class="modal-brand-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10h8M10 6v8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+    <span>CityMed</span>
+  </div>
+  <h2 class="modal-title">Welcome back</h2>
+  <p class="modal-sub">Sign in to your healthcare account</p>
+
+  <button class="oauth-btn" onclick="signInWithGoogle()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+    Continue with Google
+  </button>
+  <div class="divider"><span>or sign in with email</span></div>
+
+  <div class="form-group" id="lg-email-group">
+    <label>Email address</label>
+    <input type="email" placeholder="you@example.com" id="loginEmail" autocomplete="email"/>
+    <span class="field-error" id="lg-email-err"></span>
+  </div>
+  <div class="form-group" id="lg-pass-group">
+    <label>Password</label>
+    <div class="input-wrap">
+      <input type="password" placeholder="Enter your password" id="loginPassword" autocomplete="current-password"/>
+      <button class="toggle-pass" type="button" onclick="togglePass('loginPassword',this)" aria-label="Show password">
+        <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <span class="field-error" id="lg-pass-err"></span>
+    <a href="#" class="form-hint" onclick="openModal('forgotModal'); return false;">Forgot password?</a>
+  </div>
+  <button class="modal-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
+  <p class="modal-switch">Don't have an account? <a href="#" onclick="switchModal('loginModal','registerModal'); return false;">Create account</a></p>
+</div>
+
+<!-- ═══════════ REGISTER MODAL ═══════════ -->
+<div class="modal" id="registerModal">
+  <button class="modal-close" id="closeRegister" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="modal-brand">
+    <div class="modal-brand-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10h8M10 6v8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+    <span>CityMed</span>
+  </div>
+  <h2 class="modal-title">Create account</h2>
+  <p class="modal-sub">Free access to all partner hospitals</p>
+
+  <button class="oauth-btn" onclick="signInWithGoogle()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+    Continue with Google
+  </button>
+  <div class="divider"><span>or register with email</span></div>
+
+  <div class="form-row">
+    <div class="form-group" id="rg-fn-group">
+      <label>First name</label>
+      <input type="text" placeholder="John" id="regFirstName" autocomplete="given-name"/>
+      <span class="field-error" id="rg-fn-err"></span>
+    </div>
+    <div class="form-group" id="rg-ln-group">
+      <label>Last name</label>
+      <input type="text" placeholder="Doe" id="regLastName" autocomplete="family-name"/>
+      <span class="field-error" id="rg-ln-err"></span>
+    </div>
+  </div>
+  <div class="form-group" id="rg-email-group">
+    <label>Email address</label>
+    <input type="email" placeholder="you@example.com" id="regEmail" autocomplete="email"/>
+    <span class="field-error" id="rg-email-err"></span>
+  </div>
+  <div class="form-group" id="rg-phone-group">
+    <label>Phone number</label>
+    <input type="tel" placeholder="+1 234 567 8900" id="regPhone" autocomplete="tel"/>
+    <span class="field-error" id="rg-phone-err"></span>
+  </div>
+  <div class="form-group" id="rg-pass-group">
+    <label>Password</label>
+    <div class="input-wrap">
+      <input type="password" placeholder="Min. 8 characters" id="regPassword" autocomplete="new-password"/>
+      <button class="toggle-pass" type="button" onclick="togglePass('regPassword',this)" aria-label="Show password">
+        <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <span class="field-error" id="rg-pass-err"></span>
+  </div>
+  <button class="modal-btn" id="registerBtn" onclick="handleRegister()">Create Account</button>
+  <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('registerModal','loginModal'); return false;">Sign in</a></p>
+</div>
+
+<!-- ═══════════ FORGOT PASSWORD MODAL ═══════════ -->
+<div class="modal" id="forgotModal">
+  <button class="modal-close" id="closeForgot" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="modal-brand">
+    <div class="modal-brand-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10h8M10 6v8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+    <span>CityMed</span>
+  </div>
+  <h2 class="modal-title">Reset password</h2>
+  <p class="modal-sub">Enter your email and we'll send a 6-digit code</p>
+  <div class="form-group" id="fp-email-group">
+    <label>Email address</label>
+    <input type="email" placeholder="you@example.com" id="fpEmail"/>
+    <span class="field-error" id="fp-email-err"></span>
+  </div>
+  <div id="fpOtpSection" style="display:none;">
+    <div class="form-group">
+      <label>Verification code</label>
+      <input type="text" placeholder="Enter 6-digit code" id="fpOtp" maxlength="6" style="letter-spacing:8px;font-size:20px;text-align:center;"/>
+    </div>
+    <div class="form-group" id="fp-newpass-group">
+      <label>New password</label>
+      <div class="input-wrap">
+        <input type="password" placeholder="Min. 8 characters" id="fpNewPass"/>
+        <button class="toggle-pass" type="button" onclick="togglePass('fpNewPass',this)">
+          <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <button class="modal-btn" onclick="handleResetPassword()">Set New Password</button>
+  </div>
+  <button class="modal-btn" id="fpSendBtn" onclick="sendResetCode()">Send Reset Code</button>
+  <p class="modal-switch"><a href="#" onclick="switchModal('forgotModal','loginModal'); return false;">← Back to sign in</a></p>
+</div>
+
+<!-- ═══════════ PROFILE MODAL ═══════════ -->
+<div class="modal modal-wide" id="profileModal">
+  <button class="modal-close" id="closeProfile" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <h2 class="modal-title">My Profile</h2>
+  <div class="profile-layout">
+    <div class="profile-avatar-section">
+      <div class="avatar-wrap" id="profileAvatarWrap">
+        <img id="profileAvatarImg" src="" alt="Avatar" style="display:none;"/>
+        <div class="avatar-placeholder" id="avatarPlaceholder">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <label class="avatar-upload-btn" for="avatarInput">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(this)"/>
+      </div>
+      <div class="profile-id-badge">
+        <span class="profile-id-label">Patient ID</span>
+        <span class="profile-id-value" id="profileUserId">—</span>
+      </div>
+      <div class="profile-stats">
+        <div class="pstat"><span id="pstatAppt">0</span><small>Appointments</small></div>
+        <div class="pstat"><span id="pstatReports">0</span><small>Reports</small></div>
+      </div>
+    </div>
+    <div class="profile-form-section">
+      <div class="form-row">
+        <div class="form-group"><label>First name</label><input type="text" id="pfFirstName"/></div>
+        <div class="form-group"><label>Last name</label><input type="text" id="pfLastName"/></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="pfEmail" readonly style="opacity:.6;cursor:not-allowed;"/></div>
+      <div class="form-group"><label>Phone</label><input type="tel" id="pfPhone"/></div>
+      <div class="form-group"><label>Date of birth</label><input type="date" id="pfDob"/></div>
+      <div class="form-group"><label>Blood type</label>
+        <select id="pfBlood">
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Allergies / Notes</label><textarea id="pfNotes" rows="3" placeholder="Any known allergies or medical notes..."></textarea></div>
+      <div class="profile-actions">
+        <button class="modal-btn" onclick="saveProfile()">Save Changes</button>
+        <button class="btn-outline danger" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HELP MODAL ═══════════ -->
+<div class="modal modal-wide" id="helpModal">
+  <button class="modal-close" id="closeHelp" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <h2 class="modal-title">Help Center</h2>
+  <p class="modal-sub">How can we assist you today?</p>
+  <div class="help-grid">
+    <div class="help-card">
+      <div class="help-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <h4>Booking Guide</h4>
+      <p>Learn how to search, select, and confirm hospital appointments.</p>
+      <a href="#">Read guide</a>
+    </div>
+    <div class="help-card">
+      <div class="help-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <h4>Account Issues</h4>
+      <p>Reset your password or recover access to your account.</p>
+      <a href="#" onclick="switchModal('helpModal','forgotModal'); return false;">Get help</a>
+    </div>
+    <div class="help-card">
+      <div class="help-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.59A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+      </div>
+      <h4>Contact Support</h4>
+      <p>Speak with our team — available Mon–Fri, 8AM–8PM.</p>
+      <a href="tel:010114">Call 010-114</a>
+    </div>
+    <div class="help-card">
+      <div class="help-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h4>Common Questions</h4>
+      <p>Browse our FAQ covering appointments, cancellations, and insurance.</p>
+      <a href="#">View FAQ</a>
+    </div>
+  </div>
+  <div class="help-search-wrap">
+    <input type="text" placeholder="Search help articles..." class="help-search-input"/>
+    <button class="help-search-btn">Search</button>
+  </div>
+</div>
+
+<!-- ═══════════ HOSPITAL DETAIL MODAL ═══════════ -->
+<div class="modal modal-wide" id="hospitalModal">
+  <button class="modal-close" id="closeHospital" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="hosp-modal-header">
+    <div class="hosp-modal-icon-wrap" id="hospModalIcon"></div>
+    <div>
+      <h2 class="modal-title" id="hospModalName">Hospital Name</h2>
+      <span class="badge badge-gold" id="hospModalBadge">Grade A+</span>
+    </div>
+  </div>
+  <div class="hosp-modal-meta" id="hospModalMeta"></div>
+  <div class="hosp-modal-tabs">
+    <button class="hm-tab active" onclick="switchHospTab(this,'htOverview')">Overview</button>
+    <button class="hm-tab" onclick="switchHospTab(this,'htDepts')">Departments</button>
+    <button class="hm-tab" onclick="switchHospTab(this,'htHours')">Hours</button>
+  </div>
+  <div class="hosp-tab-panel" id="htOverview"><p id="hospModalDesc"></p></div>
+  <div class="hosp-tab-panel hidden" id="htDepts"><div class="dept-chips" id="hospModalDepts"></div></div>
+  <div class="hosp-tab-panel hidden" id="htHours"><div class="hours-table" id="hospModalHours"></div></div>
+  <button class="modal-btn" style="margin-top:20px;" onclick="openBookingFromHospital()">Book Appointment</button>
+</div>
+
+<!-- ═══════════ BOOKING MODAL ═══════════ -->
+<div class="modal modal-wide" id="bookingModal">
+  <button class="modal-close" id="closeBooking" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <h2 class="modal-title">Book Appointment</h2>
+  <p class="modal-sub" id="bookingSubtitle">Select a doctor and time</p>
+
+  <!-- Step indicator -->
+  <div class="booking-steps">
+    <div class="bstep active" data-step="1"><span>1</span> Details</div>
+    <div class="bstep" data-step="2"><span>2</span> Doctor</div>
+    <div class="bstep" data-step="3"><span>3</span> Payment</div>
+  </div>
+
+  <!-- Step 1: Patient details -->
+  <div class="booking-step-panel" id="bstep1">
+    <div class="patient-id-notice" id="bookingPatientId">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span>Patient ID will be auto-filled</span>
+    </div>
+    <div class="form-group" id="bk-name-group">
+      <label>Full name</label>
+      <input type="text" id="bookName"/>
+      <span class="field-error" id="bk-name-err"></span>
+    </div>
+    <div class="form-group" id="bk-phone-group">
+      <label>Phone number</label>
+      <input type="tel" id="bookPhone"/>
+      <span class="field-error" id="bk-phone-err"></span>
+    </div>
+    <div class="form-row">
+      <div class="form-group" id="bk-date-group">
+        <label>Preferred date</label>
+        <input type="date" id="bookDate"/>
+        <span class="field-error" id="bk-date-err"></span>
+      </div>
+      <div class="form-group" id="bk-time-group">
+        <label>Preferred time</label>
+        <select id="bookTime">
+          <option value="">Select time</option>
+          <option>08:00 AM</option><option>09:00 AM</option><option>10:00 AM</option>
+          <option>11:00 AM</option><option>02:00 PM</option><option>03:00 PM</option>
+          <option>04:00 PM</option>
+        </select>
+        <span class="field-error" id="bk-time-err"></span>
+      </div>
+    </div>
+    <div class="form-group" id="bk-dept-group">
+      <label>Department</label>
+      <select id="bookDept">
+        <option value="">Select department</option>
+        <option>Cardiology</option><option>Neurology</option><option>Pediatrics</option>
+        <option>Orthopedics</option><option>General Medicine</option><option>Oncology</option>
+        <option>Ophthalmology</option><option>Dentistry</option>
+      </select>
+      <span class="field-error" id="bk-dept-err"></span>
+    </div>
+    <div class="form-group">
+      <label>Reason for visit</label>
+      <textarea id="bookReason" rows="2" placeholder="Briefly describe your symptoms or reason..."></textarea>
+    </div>
+    <button class="modal-btn" onclick="bookingNextStep(1)">Continue</button>
+  </div>
+
+  <!-- Step 2: Doctor selection -->
+  <div class="booking-step-panel hidden" id="bstep2">
+    <div class="doctor-select-grid" id="doctorSelectGrid">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="booking-nav">
+      <button class="btn-outline" onclick="bookingGoStep(1)">Back</button>
+      <button class="modal-btn" onclick="bookingNextStep(2)">Continue to Payment</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Payment -->
+  <div class="booking-step-panel hidden" id="bstep3">
+    <div class="booking-summary" id="bookingSummary"></div>
+    <div class="payment-section">
+      <label class="section-label">Select payment method</label>
+      <div class="payment-methods">
+        <label class="pay-method">
+          <input type="radio" name="payMethod" value="card" checked/>
+          <div class="pay-method-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span>Credit / Debit Card</span>
+          </div>
+        </label>
+        <label class="pay-method">
+          <input type="radio" name="payMethod" value="alipay"/>
+          <div class="pay-method-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+            <span>Alipay</span>
+          </div>
+        </label>
+        <label class="pay-method">
+          <input type="radio" name="payMethod" value="wechat"/>
+          <div class="pay-method-card">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            <span>WeChat Pay</span>
+          </div>
+        </label>
+      </div>
+      <!-- Card fields -->
+      <div id="cardFields">
+        <div class="form-group"><label>Card number</label><input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>Expiry</label><input type="text" id="cardExp" placeholder="MM/YY" maxlength="5"/></div>
+          <div class="form-group"><label>CVV</label><input type="text" id="cardCvv" placeholder="123" maxlength="3"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="booking-total">
+      <span>Consultation fee</span><span class="total-amount">¥ 150.00</span>
+    </div>
+    <div class="booking-nav">
+      <button class="btn-outline" onclick="bookingGoStep(2)">Back</button>
+      <button class="modal-btn" id="confirmBookingBtn" onclick="confirmBooking()">Confirm &amp; Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MEDICAL REPORTS MODAL ═══════════ -->
+<div class="modal modal-wide" id="reportsModal">
+  <button class="modal-close" id="closeReports" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <h2 class="modal-title">Medical Records</h2>
+  <p class="modal-sub">Your diagnoses, reports and prescriptions</p>
+  <div class="reports-tabs">
+    <button class="rtab active" onclick="switchReportTab(this,'rtDiagnosis')">Diagnosis</button>
+    <button class="rtab" onclick="switchReportTab(this,'rtMeds')">Medications</button>
+    <button class="rtab" onclick="switchReportTab(this,'rtAppts')">Appointments</button>
+  </div>
+  <div class="report-panel" id="rtDiagnosis">
+    <div class="empty-state-small" id="diagnosisEmpty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p>No diagnosis records yet</p>
+    </div>
+    <div id="diagnosisList"></div>
+  </div>
+  <div class="report-panel hidden" id="rtMeds">
+    <div class="empty-state-small">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><path d="M19 9l-7 8-4-4"/></svg>
+      <p>No medication records yet</p>
+    </div>
+  </div>
+  <div class="report-panel hidden" id="rtAppts">
+    <div id="myAppointmentsList"></div>
+  </div>
+</div>
+
+<!-- ═══════════ QR CODE MODAL ═══════════ -->
+<div class="modal" id="qrModal">
+  <button class="modal-close" id="closeQr" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <h2 class="modal-title" style="text-align:center;">Scan to Open CityMed</h2>
+  <p class="modal-sub" style="text-align:center;">Point your phone camera at this code</p>
+  <div style="display:flex;justify-content:center;margin:20px 0;">
+    <div id="qrCanvas" style="width:200px;height:200px;"></div>
+  </div>
+  <p style="text-align:center;font-size:12px;color:var(--muted);">citymed.health</p>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE CONTENT
+═══════════════════════════════════════ -->
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.59A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+    010-114 &nbsp;/&nbsp; 116114 Phone Appointment
+  </div>
+  <div class="topbar-right" id="topbarRight">
+    <span>Welcome to CityMed</span>
+    <span class="topbar-divider">|</span>
+    <a href="#" class="topbar-link" onclick="openModal('loginModal'); return false;">Sign In</a>
+    <a href="#" class="topbar-link" onclick="openModal('registerModal'); return false;">Register</a>
+    <span class="topbar-divider">|</span>
+    <a href="#" class="topbar-link" onclick="openModal('helpModal'); return false;">Help</a>
+    <a href="#" class="topbar-link" onclick="openModal('qrModal'); return false;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="17" y="14" width="4" height="4"/><rect x="14" y="17" width="4" height="4"/></svg>
+      QR
+    </a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-mark">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <rect width="22" height="22" rx="6" fill="white" fill-opacity=".15"/>
+          <path d="M6 11h10M11 6v10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">CityMed</span>
+        <span class="logo-tagline">Unified Healthcare Platform</span>
+      </div>
+    </a>
+
+    <div class="search-bar">
+      <select class="search-type" id="searchType">
+        <option value="hospital">Hospital</option>
+        <option value="department">Department</option>
+        <option value="doctor">Doctor</option>
+        <option value="medicine">Medicine</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Search hospitals, doctors, departments, medicines..."
+             onkeydown="if(event.key==='Enter') doSearch()"/>
+      <button onclick="doSearch()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
+    </div>
+
+    <!-- User area (right side of header) -->
+    <div class="header-user" id="headerUser">
+      <button class="header-user-btn" onclick="openModal('loginModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Sign In
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li class="has-dropdown">
+        <a href="#">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          All Departments
+        </a>
+        <ul class="dropdown">
+          <li><a href="#" onclick="filterByDept('Internal Medicine'); return false;">Internal Medicine</a></li>
+          <li><a href="#" onclick="filterByDept('Cardiology'); return false;">Cardiology</a></li>
+          <li><a href="#" onclick="filterByDept('Neurology'); return false;">Neurology</a></li>
+          <li><a href="#" onclick="filterByDept('Surgery'); return false;">Surgery</a></li>
+          <li><a href="#" onclick="filterByDept('Pediatrics'); return false;">Pediatrics</a></li>
+          <li><a href="#" onclick="filterByDept('Orthopedics'); return false;">Orthopedics</a></li>
+          <li><a href="#" onclick="filterByDept('Ophthalmology'); return false;">Ophthalmology</a></li>
+          <li><a href="#" onclick="filterByDept('Oncology'); return false;">Oncology</a></li>
+        </ul>
+      </li>
+      <li><a href="#" onclick="scrollToSection('hospitals'); return false;">Hospitals</a></li>
+      <li><a href="#" onclick="scrollToSection('doctors-section'); return false;">Doctors</a></li>
+      <li><a href="#" onclick="scrollToSection('medicines-section'); return false;">Medicines</a></li>
+      <li><a href="#" onclick="scrollToSection('notices'); return false;">Notices</a></li>
+    </ul>
+    <a href="#" class="nav-cta" onclick="requireLogin(()=>openModal('bookingModal')); return false;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Book Appointment
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <!-- Dept sidebar -->
+    <aside class="dept-sidebar">
+      <div class="dept-group">
+        <span class="dept-label">Internal Medicine</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Cardiology'); return false;">Cardiology</a>
+          <a href="#" onclick="filterByDept('Hypertension'); return false;">Hypertension</a>
+        </div>
+      </div>
+      <div class="dept-group">
+        <span class="dept-label">Surgery</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Neurosurgery'); return false;">Neurosurgery</a>
+          <a href="#" onclick="filterByDept('Surgery'); return false;">General Surgery</a>
+        </div>
+      </div>
+      <div class="dept-group">
+        <span class="dept-label">Pediatrics</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Pediatrics'); return false;">Neonatal</a>
+          <a href="#" onclick="filterByDept('Pediatrics'); return false;">Growth</a>
+        </div>
+      </div>
+      <div class="dept-group">
+        <span class="dept-label">Ophthalmology</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Ophthalmology'); return false;">Cataract</a>
+          <a href="#" onclick="filterByDept('Ophthalmology'); return false;">Laser Vision</a>
+        </div>
+      </div>
+      <div class="dept-group">
+        <span class="dept-label">Dentistry</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Dentistry'); return false;">Orthodontics</a>
+          <a href="#" onclick="filterByDept('Dentistry'); return false;">Implants</a>
+        </div>
+      </div>
+      <div class="dept-group">
+        <span class="dept-label">Oncology</span>
+        <div class="dept-tags">
+          <a href="#" onclick="filterByDept('Oncology'); return false;">Chemotherapy</a>
+          <a href="#" onclick="filterByDept('Oncology'); return false;">Screening</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Carousel -->
+    <div class="carousel-wrap">
+      <div class="carousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide slide-1">
+            <div class="slide-content">
+              <span class="slide-tag">Official Platform</span>
+              <h2>Your Health, Our Priority</h2>
+              <p>Book trusted hospital appointments across the city — fast, verified, and secure.</p>
+              <a href="#" class="slide-btn" onclick="scrollToSection('hospitals'); return false;">Browse Hospitals</a>
+            </div>
+          </div>
+          <div class="carousel-slide slide-2">
+            <div class="slide-content">
+              <span class="slide-tag">Top Specialists</span>
+              <h2>World-Class Physicians</h2>
+              <p>Access the city's finest specialists in cardiology, neurology, oncology and more.</p>
+              <a href="#" class="slide-btn" onclick="scrollToSection('doctors-section'); return false;">Find Doctors</a>
+            </div>
+          </div>
+          <div class="carousel-slide slide-3">
+            <div class="slide-content">
+              <span class="slide-tag">24/7 Emergency</span>
+              <h2>Always Here When You Need Us</h2>
+              <p>Emergency slots available around the clock for urgent medical care.</p>
+              <a href="#" class="slide-btn" onclick="requireLogin(()=>openModal('bookingModal')); return false;">Emergency Booking</a>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-btn prev" id="prevBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn next" id="nextBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="carousel-dots" id="carouselDots">
+          <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick book panel -->
+    <div class="quick-book">
+      <div class="qb-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Quick Appointment
+      </div>
+      <div class="qb-form">
+        <label>District</label>
+        <select id="qbDistrict">
+          <option value="">Select district</option>
+          <option>Downtown</option><option>Westside</option>
+          <option>North District</option><option>East District</option>
+        </select>
+        <label>Hospital level</label>
+        <select id="qbLevel">
+          <option value="">Select level</option>
+          <option>Grade A+ (Top)</option><option>Grade A</option>
+          <option>Grade B</option><option>Community Clinic</option>
+        </select>
+        <label>Hospital</label>
+        <select id="qbHospital">
+          <option value="">Select hospital</option>
+          <option>City General Hospital</option><option>Metro Medical Center</option>
+          <option>Children's Research Hospital</option><option>Capital Cardiology Center</option>
+        </select>
+        <label>Department</label>
+        <select id="qbDept">
+          <option value="">Select department</option>
+          <option>Cardiology</option><option>Neurology</option><option>Pediatrics</option>
+          <option>Orthopedics</option><option>General Medicine</option>
+        </select>
+        <button class="qb-btn" onclick="quickBookSubmit()">Find Available Slots</button>
+      </div>
+      <div class="qb-help">
+        <div class="qb-help-title">Help Center</div>
+        <div class="qb-help-links">
+          <a href="#" onclick="openModal('helpModal'); return false;">Account Guide</a>
+          <a href="#" onclick="openModal('helpModal'); return false;">Booking Guide</a>
+          <a href="#" onclick="openModal('helpModal'); return false;">Account Issues</a>
+          <a href="#" onclick="openModal('helpModal'); return false;">FAQ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOSPITALS SECTION -->
+<section class="content-section" id="hospitals">
+  <div class="content-inner">
+    <div class="hospitals-main">
+      <div class="section-header-row">
+        <div class="section-tabs">
+          <button class="tab-btn active" onclick="switchTab(this)">Hospitals</button>
+          <button class="tab-btn" onclick="switchTab(this)">Departments</button>
+        </div>
+        <div class="district-filter">
+          <button class="dist-btn active" onclick="filterDistrict(this,'all')">All</button>
+          <button class="dist-btn" onclick="filterDistrict(this,'east')">East</button>
+          <button class="dist-btn" onclick="filterDistrict(this,'west')">West</button>
+          <button class="dist-btn" onclick="filterDistrict(this,'north')">North</button>
+          <button class="dist-btn" onclick="filterDistrict(this,'south')">South</button>
+          <button class="dist-btn" onclick="filterDistrict(this,'other')">Other</button>
+        </div>
+      </div>
+      <div class="hospital-grid" id="hospitalGrid"></div>
+      <div class="more-link">
+        <a href="#" onclick="loadMoreHospitals(); return false;">View More Hospitals</a>
+      </div>
+    </div>
+    <aside class="hospitals-aside" id="notices">
+      <div class="aside-box">
+        <div class="aside-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          Latest Notices
+          <a href="#" class="aside-more">More</a>
+        </div>
+        <ul class="aside-list" id="noticeList"></ul>
+      </div>
+      <div class="aside-box">
+        <div class="aside-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          Suspension Notices
+          <a href="#" class="aside-more">More</a>
+        </div>
+        <ul class="aside-list" id="suspensionList"></ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- DOCTORS SECTION -->
+<section class="content-section alt-bg" id="doctors-section">
+  <div class="content-inner" style="display:block;">
+    <div class="section-title-wrap">
+      <h2 class="section-title">Our Specialist Doctors</h2>
+      <p class="section-subtitle">Book directly with our verified medical professionals</p>
+    </div>
+    <div class="doctor-category-tabs" id="doctorCatTabs">
+      <button class="dcat-btn active" onclick="filterDoctors(this,'all')">All</button>
+      <button class="dcat-btn" onclick="filterDoctors(this,'Cardiology')">Cardiology</button>
+      <button class="dcat-btn" onclick="filterDoctors(this,'Neurology')">Neurology</button>
+      <button class="dcat-btn" onclick="filterDoctors(this,'Pediatrics')">Pediatrics</button>
+      <button class="dcat-btn" onclick="filterDoctors(this,'Orthopedics')">Orthopedics</button>
+      <button class="dcat-btn" onclick="filterDoctors(this,'Oncology')">Oncology</button>
+    </div>
+    <div class="doctors-grid" id="doctorsGrid"></div>
+  </div>
+</section>
+
+<!-- MEDICINES SECTION -->
+<section class="content-section" id="medicines-section">
+  <div class="content-inner" style="display:block;">
+    <div class="section-title-wrap">
+      <h2 class="section-title">Medicine Information</h2>
+      <p class="section-subtitle">Search our database of medications and treatments</p>
+    </div>
+    <div class="med-search-bar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="medSearchInput" placeholder="Search medicine name, condition, or ingredient..." oninput="searchMedicines()"/>
+    </div>
+    <div class="medicines-grid" id="medicinesGrid"></div>
+  </div>
+</section>
+
+<!-- STATS BANNER -->
+<section class="stats-banner">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num" data-target="500">0</span><span class="stat-unit">+</span>
+      <span class="stat-label">Partner Hospitals</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="1200">0</span><span class="stat-unit">+</span>
+      <span class="stat-label">Specialist Doctors</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="98">0</span><span class="stat-unit">%</span>
+      <span class="stat-label">Success Rate</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="2000000">0</span><span class="stat-unit">+</span>
+      <span class="stat-label">Patients Served</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <div class="logo-mark small">
+          <svg width="16" height="16" viewBox="0 0 22 22" fill="none"><path d="M6 11h10M11 6v10" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <span>CityMed</span>
+      </div>
+      <p>Your trusted gateway to healthcare appointments across the city.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="WeChat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </a>
+        <a href="#" aria-label="Weibo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#" onclick="requireLogin(()=>openModal('bookingModal')); return false;">Book Appointment</a></li>
+        <li><a href="#" onclick="scrollToSection('doctors-section'); return false;">Find a Doctor</a></li>
+        <li><a href="#" onclick="requireLogin(()=>openModal('reportsModal')); return false;">Medical Records</a></li>
+        <li><a href="#" onclick="scrollToSection('medicines-section'); return false;">Medicine Info</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Browse</h4>
+      <ul>
+        <li><a href="#" onclick="scrollToSection('hospitals'); return false;">By Hospital</a></li>
+        <li><a href="#" onclick="scrollToSection('hospitals'); return false;">By Department</a></li>
+        <li><a href="#" onclick="scrollToSection('doctors-section'); return false;">Specialists</a></li>
+        <li><a href="#" onclick="scrollToSection('medicines-section'); return false;">Medicines</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('helpModal'); return false;">Help Center</a></li>
+        <li><a href="#" onclick="openModal('helpModal'); return false;">Booking FAQ</a></li>
+        <li><a href="#" onclick="openModal('helpModal'); return false;">Contact Us</a></li>
+        <li><a href="#" onclick="openModal('helpModal'); return false;">Report Issue</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Account</h4>
+      <ul>
+        <li><a href="#" onclick="openModal('loginModal'); return false;">Sign In</a></li>
+        <li><a href="#" onclick="openModal('registerModal'); return false;">Register</a></li>
+        <li><a href="#" onclick="requireLogin(()=>openModal('profileModal')); return false;">My Profile</a></li>
+        <li><a href="#" onclick="requireLogin(()=>openModal('reportsModal')); return false;">My Records</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 CityMed Unified Healthcare Platform. All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Accessibility</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="hos2.js"></script>
+</body>
+</html>
