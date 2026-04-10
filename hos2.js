@@ -1024,7 +1024,7 @@
     const el = document.getElementById('qrCanvas');
     if (!el) return;
     el.innerHTML = '';
-    const url = window.location.href.split('?')[0] || 'http://127.0.0.1:5500/hos2.html';
+    const url = 'https://saif06js.github.io/citymed/hos2.html';
     const isDark = document.body.classList.contains('dark');
     
     const canvas = document.createElement('canvas');
