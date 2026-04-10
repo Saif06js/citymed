@@ -166,11 +166,11 @@
       DATA — Doctors
    ───────────────────────────────────────────── */
    const doctors = [
-     { id:1,  name:"Dr. Sarah Chen",     spec:"Cardiology",    hospital:"Capital Cardiology Center",    rating:4.9, fee:200, avail:"Mon, Wed, Fri" },
+     { id:1,  name:"Dr. Nafiu Aminu",     spec:"Cardiology",    hospital:"Capital Cardiology Center",    rating:4.9, fee:200, avail:"Mon, Wed, Fri" },
      { id:2,  name:"Dr. James Okafor",   spec:"Neurology",     hospital:"Union Neurology Hospital",     rating:4.8, fee:180, avail:"Tue, Thu" },
      { id:3,  name:"Dr. Lin Wei",        spec:"Pediatrics",    hospital:"Children's Research Hospital", rating:4.9, fee:150, avail:"Mon–Fri" },
      { id:4,  name:"Dr. Ahmed Hassan",   spec:"Orthopedics",   hospital:"City General Hospital",        rating:4.7, fee:170, avail:"Mon, Tue, Thu" },
-     { id:5,  name:"Dr. Maria Santos",   spec:"Oncology",      hospital:"Metro Medical Center",         rating:4.9, fee:220, avail:"Wed, Fri" },
+     { id:5,  name:"Dr. Rufai Bello",   spec:"Oncology",      hospital:"Metro Medical Center",         rating:4.9, fee:220, avail:"Wed, Fri" },
      { id:6,  name:"Dr. Yuki Tanaka",    spec:"Ophthalmology", hospital:"East Eye & Dental Clinic",     rating:4.8, fee:140, avail:"Mon–Sat" },
      { id:7,  name:"Dr. Priya Sharma",   spec:"Cardiology",    hospital:"City General Hospital",        rating:4.7, fee:190, avail:"Tue, Thu, Sat" },
      { id:8,  name:"Dr. Carlos Rivera",  spec:"Neurology",     hospital:"City General Hospital",        rating:4.6, fee:160, avail:"Mon, Wed" },
