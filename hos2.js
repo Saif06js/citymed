@@ -746,6 +746,7 @@ window.formatCard = function(input) {
       if (method === 'card') {
         console.log('stripeCardElement:', stripeCardElement);
         if (!stripeCardElement) throw new Error('Card element not mounted');
+        console.log('Confirming payment...');
         result = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
             card: stripeCardElement,
@@ -765,7 +766,8 @@ window.formatCard = function(input) {
         });
       }
   
-      if (result?.error) throw new Error(result.error.message);
+      console.log('Payment result:', result);
+      if (result?.error) throw new Error(result.error.message); 
   
       // Step 3 — save booking to Supabase
       await db.from('bookings').insert({
