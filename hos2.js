@@ -755,14 +755,11 @@ window.formatCard = function(input) {
               email: currentUser?.email || ''
             }
           }
-        }, { handleActions: false });
+        });
         
         console.log('Payment result:', result);
-        
-        if (result?.paymentIntent?.status === 'requires_action') {
-          result = await stripe.confirmCardPayment(clientSecret);
-        }
-      } else if (method === 'alipay') {
+       } 
+    else if (method === 'alipay') {
         result = await stripe.confirmAlipayPayment(clientSecret, {
           return_url: window.location.href
         });
