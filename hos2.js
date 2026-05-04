@@ -744,7 +744,8 @@ window.formatCard = function(input) {
       // Step 2 — confirm payment with Stripe
       let result;
       if (method === 'card') {
-        // Get card details from Stripe Elements
+        console.log('stripeCardElement:', stripeCardElement);
+        if (!stripeCardElement) throw new Error('Card element not mounted');
         result = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
             card: stripeCardElement,
