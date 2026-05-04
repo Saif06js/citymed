@@ -773,8 +773,14 @@ window.formatCard = function(input) {
       }
   
       console.log('Payment result:', result);
-      if (result?.error) throw new Error(result.error.message); 
-  
+      if (result?.error) throw new Error(result.error.message);
+
+      // Re-fetch session in case it was lost
+      const { data: { session } } = await db.auth.getSession();
+      if (session?.user) currentUser = session.user;
+      
+      console.log('Saving booking, user:', currentUser?.id);
+      
       // Step 3 — save booking to Supabase
       await db.from('bookings').insert({
         user_id: currentUser?.id || null,
