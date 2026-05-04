@@ -680,6 +680,10 @@
 let stripeCardElement = null;
 
 function mountStripeCard() {
+  if (stripeCardElement) {
+    stripeCardElement.destroy();
+    stripeCardElement = null;
+  }
   const elements = stripe.elements();
   stripeCardElement = elements.create('card', {
     style: {
@@ -720,7 +724,10 @@ window.formatCard = function(input) {
       // Step 1 — create payment intent via Edge Function
       const res = await fetch(`https://qzppzysjzgslfmlalqcd.supabase.co/functions/v1/create-payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+        },
         body: JSON.stringify({
           amount: 150,
           currency: 'usd',
@@ -730,7 +737,9 @@ window.formatCard = function(input) {
       });
   
       const { clientSecret, error: fnError } = await res.json();
+      console.log('Got clientSecret:', clientSecret);
       if (fnError) throw new Error(fnError);
+      if (!clientSecret) throw new Error('No client secret returned');
   
       // Step 2 — confirm payment with Stripe
       let result;
@@ -739,7 +748,10 @@ window.formatCard = function(input) {
         result = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
             card: stripeCardElement,
-            billing_details: { name }
+            billing_details: { 
+              name,
+              email: currentUser?.email || ''
+            }
           }
         });
       } else if (method === 'alipay') {
